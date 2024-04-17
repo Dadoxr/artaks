@@ -1,0 +1,8 @@
+django
+python-dotenv 
+django-crispy-forms 
+crispy-bootstrap5
+django-cors-headers
+celery
+psycopg2-binary
+gunicorn
