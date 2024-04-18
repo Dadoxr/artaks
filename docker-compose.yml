@@ -1,14 +1,15 @@
+version: '3.8'
 services:
     web:
         build: .
-        command: bash -c "mkdir -p /var/log/gunicorn/ && python3 manage.py migrate  && python3 manage.py runserver 0.0.0.0:80"
+        command: bash -c "mkdir -p /var/log/gunicorn/ && python3 manage.py migrate && python3 manage.py collectstatic --noinput && gunicorn --config gunicorn_config.py config.wsgi:application"
         tty: true
         restart: always
         volumes:
             - .:/app/
             - static_volume:/app/static
-        ports:
-            - "8000:80"
+        expose:
+            - "80"
         env_file:
             - ./var/.env
         depends_on:
@@ -16,48 +17,81 @@ services:
                 condition: service_healthy
         networks:
             - dbnetwork
-
+      
     db:
-        image: postgres
+        image: postgres:14.1-alpine
         restart: always
         ports:
-            - '127.0.0.1:5432:5432'
+            - '5432:5432'
         env_file:
             - ./var/.env
         volumes:
             - pg_data:/var/lib/postgresql/data
         healthcheck:
-            test: [ "CMD-SHELL", "sh -c 'pg_isready -U root -d tainet'" ]
+            test: [ "CMD-SHELL", "sh -c 'pg_isready -U postgres -d postgres'" ]
             interval: 10s
             timeout: 5s
             retries: 5
         networks:
             - dbnetwork
 
-    # nginx:
-    #     image: nginx:alpine
-    #     restart: unless-stopped
-    #     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
-    #     depends_on:
-    #         - web
-    #     ports:
-    #         - "80:80"
-    #         - "443:443"
-    #     volumes:
-    #         - static_volume:/app/static
-    #     networks:
-    #         - dbnetwork
+    nginx:
+        image: nginx:alpine
+        restart: unless-stopped
+        command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+        depends_on:
+            - web
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - static_volume:/app/static
+        networks:
+            - dbnetwork
 
-  
+    redis:
+        image: redis
+        restart: always
+        networks:
+            - dbnetwork
+        volumes:
+            - redis_data:/data
+
+    celery_tasks:
+        build: .
+        restart: always
+        env_file:
+            - ./var/.env
+        tty: true
+        command: bash -c "echo 'Waiting for web to start...' && sleep 60 && celery -A config worker -l info -Q tasks -n tasks"
+        depends_on:
+            - web
+            - redis
+        networks:
+            - dbnetwork
+    
+    celery_beat:
+        build: .
+        restart: always
+        env_file:
+            - ./var/.env
+
+        tty: true
+        command: bash -c "echo 'Waiting for web to start...' && sleep 50 && celery -A config beat -l INFO -S django"  
+        depends_on:
+            - web
+            - redis
+        networks:
+            - dbnetwork
+
 
 
 volumes:
     pg_data:
+        driver: local
     redis_data:
     static_volume:
-
+    
 networks:
   dbnetwork:
     driver: bridge
-
-
