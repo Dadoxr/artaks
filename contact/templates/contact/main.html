@@ -1,0 +1,23 @@
+{% extends "contact/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<main class="form-signin">
+    <form method="POST" class="mx-auto">
+      <h1 class="h3 mb-3 fw-normal">Введите номер</h1>
+      {% csrf_token %}
+      {{form|crispy}}
+      {% if messages %}
+          <ul class="messages">
+              {% for message in messages %}
+                  <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+              {% endfor %}
+          </ul>
+      {% endif %}
+
+      <button type="submit" class="btn-color">Проверить</button>
+    </form>
+  </main>
+  
+{% endblock content %}
