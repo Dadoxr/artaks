@@ -6,7 +6,7 @@ from kombu import Queue
 from celery.schedules import crontab
 
 
-VAR_PATH = os.path.join(Path(__file__).resolve().parent.parent, 'var')
+VAR_PATH = os.path.join(Path(__file__).resolve().parent.parent.parent, 'var')
 dotenv.load_dotenv(os.path.join(VAR_PATH, '.env'), override=True)
 
 DEBUG = str(os.getenv('DEBUG')) == 'True'
@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'contact',
     'crispy_forms',
 	'crispy_bootstrap5',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -126,7 +127,6 @@ CELERY_IGNORE_RESULT = True
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_TIME_LIMIT = 30 * 60
-CELERY_RESULT_BACKEND = 'django-db'
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 CELERY_ENABLE_UTC=False
 CELERY_BEAT_SCHEDULE = {

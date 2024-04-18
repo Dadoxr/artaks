@@ -11,9 +11,9 @@ class Contact(models.Model):
     inn = models.BigIntegerField()
 
     def __str__(self):
-        return f'{self.pk}, {self.abc}, {self.start}, {self.end}, {self.inn}'
+        return f'Оператор: {self.operator}\nРегион: {self.region}\nТерритория: {self.territory}\nИНН: {self.inn}'
     
-
+    
     class Meta:
         verbose_name = 'contact'
         verbose_name_plural = 'contacts'
