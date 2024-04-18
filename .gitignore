@@ -84,7 +84,7 @@ Pipfile.lock
 # Node
 node_modules/
 jspm_packages/
-
+docker-compose-local.yml
 # SublimeText
 *.tmlanguage.cache
 *.tmPreferences.cache

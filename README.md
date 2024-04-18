@@ -27,7 +27,7 @@ mv var/.env.sample var/.env
 docker compose up -d
 ```
 
-4. Запустите приложение
+4. Создайте суперюзера
 
 ```
 docker compose exec -it web python3 manage.py createsuperuser
