@@ -1,3 +1,4 @@
+import sys
 import dotenv
 import os
 from pathlib import Path
@@ -77,6 +78,7 @@ DATABASES = {
 }
 
 
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -128,9 +130,9 @@ CELERY_RESULT_BACKEND = 'django-db'
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 CELERY_ENABLE_UTC=False
 CELERY_BEAT_SCHEDULE = {
-    'task_grab_contact_info': {
-        'task': 'contact.tasks.task_grab_contact_info',
-        'schedule': crontab(minute='*/1'),
+    'task_renew_contact': {
+        'task': 'contact.tasks.task_renew_contact',
+        'schedule': crontab(hour='0'),
     },
 }
 
@@ -140,3 +142,26 @@ CELERY_TASK_QUEUES = (
 CELERY_TASK_DEFAULT_QUEUE = 'other'
 CELERY_TASK_DEFAULT_EXCHANGE = 'other'
 CELERY_TASK_DEFAULT_ROUTING_KEY = 'other.default'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'stream': sys.stdout
+        }
+    },
+    'loggers': {
+        logger_name: {
+            'handlers': ['console'],
+            'propagate': False,
+            'level': 'WARNING'
+        } for logger_name in ('django', 'django_request', 'django.db.backends', 'django.template', 'core')
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO'
+    }
+}
