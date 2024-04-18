@@ -1,5 +1,5 @@
 def get_abc_and_body(number):
-    if len(number) == 11:
+    if number and len(number) == 11:
         try:
             abc, body = int(number[1:4]), int(number[4:])
         except Exception as e:

@@ -5,11 +5,9 @@ from contact.models import Contact
 from contact.services.checking import get_abc_and_body
 
 class ContactAPIiew(views.APIView):
-	permission_classes = [True]
-
 
 	def get(self, request, *args, **kwargs):
-		number = request.data.get('owner_pk')
+		number = request.data.get('number')
 		abc, body = get_abc_and_body(number)
 		if abc and body:
 			contact_object = Contact.objects.filter(abc=abc, start__lte=body, end__gte=body)
@@ -29,7 +27,7 @@ class ContactAPIiew(views.APIView):
 				status_code = status.HTTP_404_NOT_FOUND
 		else:
 			message = 'Номер не введен или введен некорректно, попробуйте еще раз (пример 79123456789)'
-			metadata = {'nubmer': ''}
+			metadata = {'number': ''}
 			status_code = status.HTTP_400_BAD_REQUEST
 		return response.Response({'message':message, 'metadata':metadata}, status=status_code)
 
