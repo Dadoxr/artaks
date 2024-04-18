@@ -27,6 +27,24 @@ mv var/.env.sample var/.env
 docker compose up -d
 ```
 
+4. Запустите приложение
+
+```
+docker compose exec -it web python3 manage.py createsuperuser
+```
+
+5. Запустите тесты
+```
+docker compose exec -it web python3 manage.py test
+```
+
+6. Наполните базу контактами
+```
+docker compose exec -it web python3 manage.py renew
+```
+
+Далее система сама раз в сутки будет обновлять базу контактов (celery-beat)
+
 ## Endpoints
 - hostname/ - форма поиска оператора по померу
 - hostname/api {'number': ...} - API для получения оператора по номеру
